@@ -16,4 +16,6 @@ func TestParse(t *testing.T) {
 	assert.Equal(t, "something", c.SlackAppID)
 	assert.Equal(t, "amazing", c.SlackClientID)
 	assert.Equal(t, "i guess", c.SlackClientSecret)
+	assert.Equal(t, EnvDevelopment, c.Env)
+	assert.Equal(t, ":12022", c.BindAddr)
 }
