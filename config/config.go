@@ -13,6 +13,8 @@ type BotConfig struct {
 	SlackAppID        string `envconfig:"SLACK_APP_ID"`
 	SlackClientID     string `envconfig:"SLACK_CLIENT_ID"`
 	SlackClientSecret string `envconfig:"SLACK_CLIENT_SECRET"`
+	SigningSecret     string `envconfig:"SLACK_SIGNING_SECRET"`
+	SlackBotToken     string `envconfig:"SLACK_BOT_TOKEN"`
 }
 
 func Parse() (*BotConfig, error) {

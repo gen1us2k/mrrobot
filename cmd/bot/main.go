@@ -12,5 +12,5 @@ func main() {
 		log.Fatal(err)
 	}
 	handler := app.NewHandler(c)
-	handler.Start()
+	log.Fatal(handler.Start())
 }
