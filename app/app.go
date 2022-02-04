@@ -7,35 +7,34 @@ import (
 	"net/http"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/labstack/echo/v4"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 )
 
 type (
+	// Handler is an interface for the webserver that handles
+	// incoming requests from Slack events API
+	//
+	// You can add support of any cloud provider by implementing this interface
 	Handler interface {
 		Init(c *config.BotConfig)
 		Start() error
 	}
+	// HTTPHandler is an implementation of webserver for local development/testing
 	HTTPHandler struct {
 		Handler
 		config *config.BotConfig
-		echo   *echo.Echo
 	}
+	// LambdaHandler adds support of AWS lambda
 	LambdaHandler struct {
 		Handler
 		config *config.BotConfig
 	}
-	SlackChallenge struct {
-		Type      string `json:"type"`
-		Token     string `json:"token"`
-		Challenge string `json:"challenge"`
-	}
-	Response struct {
-		Message string `json:"message"`
-	}
 )
 
+// NewHandler creates slack events api handler
+// It creates HTTPHandler for development environment
+// and LambdaHandler for production env
 func NewHandler(c *config.BotConfig) Handler {
 	var h Handler
 	h = &HTTPHandler{}
@@ -47,14 +46,18 @@ func NewHandler(c *config.BotConfig) Handler {
 
 }
 
+// Init initializes handler
 func (h *HTTPHandler) Init(c *config.BotConfig) {
 	h.config = c
 	http.HandleFunc("/", h.handle)
 }
 
+// Init initializes handler
 func (l *LambdaHandler) Init(c *config.BotConfig) {
 	l.config = c
 }
+
+// handle handles incoming data from
 func (h *HTTPHandler) handle(w http.ResponseWriter, r *http.Request) {
 	var api = slack.New(h.config.SlackBotToken)
 	body, err := ioutil.ReadAll(r.Body)
@@ -99,8 +102,11 @@ func (h *HTTPHandler) handle(w http.ResponseWriter, r *http.Request) {
 			_ = ev
 			spew.Dump(api.PostMessage(ev.User.ID, slack.MsgOptionText("Yes, hello.", false)))
 		}
+
 	}
 }
+
+// Start starts the server
 func (h *HTTPHandler) Start() error {
-	return http.ListenAndServe(":12022", nil)
+	return http.ListenAndServe(h.config.BindAddr, nil)
 }

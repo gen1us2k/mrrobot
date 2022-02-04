@@ -8,14 +8,14 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	os.Setenv("SLACK_APP_ID", "something")
-	os.Setenv("SLACK_CLIENT_ID", "amazing")
-	os.Setenv("SLACK_CLIENT_SECRET", "i guess")
+	os.Setenv("SLACK_SIGNING_SECRET", "something")
+	os.Setenv("SLACK_BOT_TOKEN", "amazing")
+	os.Setenv("WELCOME_MESSAGE", "i guess")
 	c, err := Parse()
 	assert.NoError(t, err)
-	assert.Equal(t, "something", c.SlackAppID)
-	assert.Equal(t, "amazing", c.SlackClientID)
-	assert.Equal(t, "i guess", c.SlackClientSecret)
+	assert.Equal(t, "something", c.SigningSecret)
+	assert.Equal(t, "amazing", c.SlackBotToken)
+	assert.Equal(t, "i guess", c.WelcomeMessage)
 	assert.Equal(t, EnvDevelopment, c.Env)
 	assert.Equal(t, ":12022", c.BindAddr)
 }
