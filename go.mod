@@ -3,6 +3,8 @@ module greeter_bot
 go 1.17
 
 require (
+	github.com/akrylysov/algnhsa v0.12.1 // indirect
+	github.com/aws/aws-lambda-go v1.28.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect

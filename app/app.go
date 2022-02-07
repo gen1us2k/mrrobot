@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/akrylysov/algnhsa"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
@@ -25,11 +26,6 @@ type (
 		Handler
 		config *config.BotConfig
 	}
-	// LambdaHandler adds support of AWS lambda
-	LambdaHandler struct {
-		Handler
-		config *config.BotConfig
-	}
 )
 
 // NewHandler creates slack events api handler
@@ -38,9 +34,6 @@ type (
 func NewHandler(c *config.BotConfig) Handler {
 	var h Handler
 	h = &HTTPHandler{}
-	if c.Env == config.EnvProduction {
-		h = &LambdaHandler{}
-	}
 	h.Init(c)
 	return h
 
@@ -52,32 +45,35 @@ func (h *HTTPHandler) Init(c *config.BotConfig) {
 	http.HandleFunc("/", h.handle)
 }
 
-// Init initializes handler
-func (l *LambdaHandler) Init(c *config.BotConfig) {
-	l.config = c
-}
-
 // handle handles incoming data from
 func (h *HTTPHandler) handle(w http.ResponseWriter, r *http.Request) {
 	var api = slack.New(h.config.SlackBotToken)
 	body, err := ioutil.ReadAll(r.Body)
+	spew.Dump("parse body")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	spew.Dump("read body")
+	spew.Dump(r.Header)
 	sv, err := slack.NewSecretsVerifier(r.Header, h.config.SigningSecret)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	spew.Dump(string(body))
+	spew.Dump("read secrets verifier")
 	if _, err := sv.Write(body); err != nil {
+		spew.Dump(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	if err := sv.Ensure(); err != nil {
+		spew.Dump(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+	spew.Dump("ensure")
 	eventsAPIEvent, err := slackevents.ParseEvent(json.RawMessage(body), slackevents.OptionNoVerifyToken())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -99,14 +95,16 @@ func (h *HTTPHandler) handle(w http.ResponseWriter, r *http.Request) {
 		spew.Dump(innerEvent)
 		switch ev := innerEvent.Data.(type) {
 		case *slackevents.TeamJoinEvent:
-			_ = ev
 			spew.Dump(api.PostMessage(ev.User.ID, slack.MsgOptionText("Yes, hello.", false)))
 		}
-
 	}
 }
 
 // Start starts the server
 func (h *HTTPHandler) Start() error {
-	return http.ListenAndServe(h.config.BindAddr, nil)
+	if h.config.Env == config.EnvDevelopment {
+		return http.ListenAndServe(h.config.BindAddr, nil)
+	}
+	algnhsa.ListenAndServe(http.DefaultServeMux, nil)
+	return nil
 }
