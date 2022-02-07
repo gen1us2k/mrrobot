@@ -95,7 +95,7 @@ func (h *HTTPHandler) handle(w http.ResponseWriter, r *http.Request) {
 		spew.Dump(innerEvent)
 		switch ev := innerEvent.Data.(type) {
 		case *slackevents.TeamJoinEvent:
-			spew.Dump(api.PostMessage(ev.User.ID, slack.MsgOptionText("Yes, hello.", false)))
+			spew.Dump(api.PostMessage(ev.User.ID, slack.MsgOptionText(h.config.WelcomeMessage, false)))
 		}
 	}
 }

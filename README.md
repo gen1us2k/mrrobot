@@ -3,7 +3,7 @@
 A simple greeter bot for your slack communities. The main reason of this bot to have better onboarding experience for newly joined users. This bot built using [slack events api](https://api.slack.com/apis/connections/events-api) and hosted on [AWS lambda](https://aws.amazon.com/lambda/)
 
 ## Local Development
-### Clonning the repo 
+### Clonning the repo
 
 ```
 git clone git@github.com:gen1us2k/mrrobot
@@ -38,9 +38,9 @@ The bot has make commands to speedup development
 3. Add a catch-all `{proxy+}` resource to handle requests to every other path (check "Configure as proxy resource").
 
     ![API Gateway catch-all](https://akrylysov.github.io/algnhsa/apigateway-catchall.png)
-4. Deploy your API gateway and copy gateway url    
-    
-    
+4. Deploy your API gateway and copy gateway url
+
+
 ### Configuring slack
 
 1. Create a [new application](https://api.slack.com/apps)
@@ -52,7 +52,7 @@ The bot has make commands to speedup development
 ### Environment variables
 
 ```
-# ENV variable can have development or production. production uses aws lambda sdk to run. development uses standard net/http handler. 
+# ENV variable can have development or production. production uses aws lambda sdk to run. development uses standard net/http handler.
 # Default: development
 ENV=development
 
