@@ -5,6 +5,7 @@ import (
 	"greeter_bot/config"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/akrylysov/algnhsa"
 	"github.com/davecgh/go-spew/spew"
@@ -95,7 +96,8 @@ func (h *HTTPHandler) handle(w http.ResponseWriter, r *http.Request) {
 		spew.Dump(innerEvent)
 		switch ev := innerEvent.Data.(type) {
 		case *slackevents.TeamJoinEvent:
-			spew.Dump(api.PostMessage(ev.User.ID, slack.MsgOptionText(h.config.WelcomeMessage, false)))
+			text := strings.Replace(h.config.WelcomeMessage, "\\n", "\n", -1)
+			spew.Dump(api.PostMessage(ev.User.ID, slack.MsgOptionText(text, false)))
 		}
 	}
 }
